@@ -17,10 +17,21 @@ const List = () => {
       .doc( 'users' )
       .onSnapshot( 
         doc => {
-          setList( arrByBasicSort( doc.data().list, 'timestamp' ) )
           setLoading( false );
+          if ( doc.data() && doc.data().list && Array.isArray( doc.data().list ) ) {
+            const tmpArr = doc.data().list;
+            if ( Array.isArray( tmpArr ) ) {
+              setList( 
+                arrByBasicSort( 
+                  tmpArr, 
+                  'timestamp' 
+                ) 
+              );
+            };
+          };
         },
         err => {
+          console.log( err );
           setErr( err );
         }      
       );
@@ -33,8 +44,13 @@ const List = () => {
   };
   return (
     <div>
+      { err && 
+        <span>{ err }</span> 
+      }
       <div>
-        Currently online user count: ${ list.length }
+        Online user count: { list && list.length } 
+      </div>
+      <div>
         <UsersList 
           list={ list }
         />
