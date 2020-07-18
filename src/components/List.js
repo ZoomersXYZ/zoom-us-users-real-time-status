@@ -7,7 +7,6 @@ const List = () => {
   const [ err, setErr ] = useState( false );
   const [ loading, setLoading ] = useState( true );
   const [ list, setList ] = useState( null );
-
   
   useEffect( () => {
     // lowest numbers on top
@@ -18,8 +17,8 @@ const List = () => {
       .doc( 'users' )
       .onSnapshot( 
         doc => {
-          setLoading( false )
           setList( arrByBasicSort( doc.data().list, 'timestamp' ) )
+          setLoading( false );
         },
         err => {
           setErr( err );
@@ -31,16 +30,15 @@ const List = () => {
 
   if ( loading ) {
     return <div>Loading</div>
-  }
-
+  };
   return (
     <div>
       <div>
         Currently online user count: ${ list.length }
+        <UsersList 
+          list={ list }
+        />
       </div>
-      <UsersList 
-        users={ list }
-      />
     </div>
   );
 };
