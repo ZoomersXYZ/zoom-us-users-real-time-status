@@ -30,7 +30,5 @@
       "last 1 safari version"
     ]
   },
-  "devDependencies": {
-    "dotenv": "^8.2.0"
-  }
+  "devDependencies": {}
 }
