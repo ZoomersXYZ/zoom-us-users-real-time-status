@@ -1,9 +1,11 @@
 import React from 'react';
-import { formatDistance } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 
-const EachUser = ( { aUser, currTime } ) => (
+const EachUser = ( { aUser } ) => (
   <li>        
-    { aUser.user_name }, { formatDistance( aUser.timestamp, currTime ) } ago
+    { aUser.user_name }, { } 
+    { formatDistanceToNow( Number( aUser.timestamp ), { includeSeconds: true } ) } 
+    { } ago
   </li>
 );
 
