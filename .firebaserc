@@ -1,0 +1,14 @@
+{
+  "projects": {
+    "default": "zoomers-fudging-rt"
+  },
+  "targets": {
+    "zoomers-fudging-rt": {
+      "hosting": {
+        "frontend": [
+          "zoomers-rt-frontend"
+        ]
+      }
+    }
+  }
+}
