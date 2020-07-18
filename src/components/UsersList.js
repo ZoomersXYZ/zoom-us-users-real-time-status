@@ -4,9 +4,12 @@ import EachUser from './EachUser';
 const UsersList = ( users ) => (
   <div>
     <ul>
-      { users.map( aUser => {} =>
-
-      }
+      { users.map( ( aUser, index ) => 
+      <EachUser 
+        key={ `auser-${ index }` } 
+        aUser={ aUser } 
+      />
+      ) }
     </ul>
   </div>
 );
