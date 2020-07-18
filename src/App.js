@@ -6,8 +6,7 @@ const App = () => (
   <div className="App">
     <header className="App-header">
     </header>
-    <List 
-    />
+    <List />
   </div>
 );
 

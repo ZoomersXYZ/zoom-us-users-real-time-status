@@ -1,8 +1,10 @@
 import React from 'react';
 
-const EachUser = ( aUser ) => (
-  <li>
+import { formatRelative } from 'date-fns';
 
+const EachUser = ( aUser ) => (
+  <li>        
+    { aUser.user_name }, { formatRelative( aUser.timestamp, new Date() ) } 
   </li>
 );
 
