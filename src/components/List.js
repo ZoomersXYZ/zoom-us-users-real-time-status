@@ -9,10 +9,11 @@ const List = () => {
   const [ list, setList ] = useState( null );
   
   useEffect( () => {
-    // lowest numbers on top
+    // Lowest numbers on top
     const arrByBasicSort = ( arr, field ) => 
       arr.sort( ( a, b ) => a[ field ] - b[ field ] );
 
+    // Core
     const stream = db.collection( 'online' )
       .doc( 'users' )
       .onSnapshot( 
@@ -35,7 +36,6 @@ const List = () => {
           setErr( err );
         }      
       );
-
       return () => stream();
   }, [] );
 
