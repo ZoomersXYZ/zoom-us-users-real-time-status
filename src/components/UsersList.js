@@ -2,7 +2,7 @@ import React from 'react';
 import EachUser from './EachUser';
 
 const UsersList = ( { list } ) => (
-  <ul>
+  <ul className="user-list">
     { !!list && list.map( ( aUser, index ) => 
     <EachUser 
       key={ `auser-${ index }` } 

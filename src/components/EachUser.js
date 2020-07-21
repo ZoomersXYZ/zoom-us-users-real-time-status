@@ -2,9 +2,9 @@ import React from 'react';
 import { formatDistanceToNow } from 'date-fns';
 
 const EachUser = ( { aUser } ) => (
-  <li>        
-    { aUser.user_name }, { } 
-    { formatDistanceToNow( Number( aUser.timestamp ), { includeSeconds: true } ) } 
+  <li className={ aUser.online ? 'active' : 'inactive' }>
+    <span className="handle">{ aUser.user_name }</span>, { } 
+    <span className="time-on">{ formatDistanceToNow( Number( aUser.timestamp ), { includeSeconds: true } ) }</span> 
     { } ago
   </li>
 );

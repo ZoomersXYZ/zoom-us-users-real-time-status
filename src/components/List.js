@@ -47,9 +47,9 @@ const List = () => {
       { err && 
         <span>{ err }</span> 
       }
-      <div>
+      <h3 className="online-count">
         Online user count: { list && list.length } 
-      </div>
+      </h3>
       <div>
         <UsersList 
           list={ list }

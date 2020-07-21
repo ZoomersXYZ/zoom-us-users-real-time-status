@@ -21,3 +21,20 @@ body {
 .App-link {
   color: #61dafb;
 }
+
+// h3.online-count {
+//   font-weight: bold;
+// }
+
+ul.user-list {
+  li.active {
+    text-decoration-line: line-through;
+
+    span.handle {
+      font-weight: bold;
+    }
+  }
+  li.inactive {
+    text-decoration-line: line-through;
+  }
+}
