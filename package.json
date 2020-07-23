@@ -5,6 +5,7 @@
   "dependencies": {
     "date-fns": "^2.15.0",
     "firebase": "^7.16.1",
+    "node-sass": "^4.14.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1"
@@ -14,7 +15,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "deploy": "firebase deploy",
+    "deploy": "npx firebase deploy",
     "buploy": "yarn build && yarn deploy"
   },
   "eslintConfig": {

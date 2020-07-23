@@ -27,9 +27,7 @@ body {
 // }
 
 ul.user-list {
-  li.active {
-    text-decoration-line: line-through;
-
+  li.active { 
     span.handle {
       font-weight: bold;
     }
