@@ -1,7 +1,7 @@
 {
-  "name": "my-app",
+  "name": "Zoom.usReactBasedReal-TimeFrontend",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "dependencies": {
     "date-fns": "^2.15.0",
     "firebase": "^7.16.1",
@@ -32,6 +32,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {}
+  }
 }

@@ -3,6 +3,16 @@ import React, { useEffect, useState } from 'react';
 import db from '../config/firebase';
 import UsersList from './UsersList';
 
+// const dreamy = async () => {
+//   let data = [];
+//   db.collection( 'groups' ).doc( nspName ).collection( 'log' ).orderBy( 'timestamp', 'desc' ).limit( 30 ).get().then( snap => {
+//     snap.forEach( doc => data.push( doc.data() ) );
+//   }, reason => {
+//     l.gen.error( '#error pullLogFromDb() async -> db.collection post then -- -> rejection' + reason );
+//   } );
+//   return data;
+// };
+
 const List = () => {
   const [ err, setErr ] = useState( false );
   const [ loading, setLoading ] = useState( true );
@@ -15,7 +25,7 @@ const List = () => {
 
     // Core
     const stream = db.collection( 'online' )
-      .doc( 'users' )
+      .doc( 'now' )
       .onSnapshot( 
         doc => {
           setLoading( false );
@@ -48,7 +58,7 @@ const List = () => {
         <span>{ err }</span> 
       }
       <h3 className="online-count">
-        Online user count: { list && list.length } 
+        Online user count: { list && list.filter( han => han.online ).length } 
       </h3>
       <div>
         <UsersList 
