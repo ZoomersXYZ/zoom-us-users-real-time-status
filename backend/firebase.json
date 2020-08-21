@@ -1,0 +1,6 @@
+{    
+  "functions": {
+    "target": "backend",
+    "source": "."
+  }
+}
