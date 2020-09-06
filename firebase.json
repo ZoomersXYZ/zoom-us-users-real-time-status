@@ -1,7 +1,7 @@
 {
   "functions": {
     "target": "backend",
-    "source": "."
+    "source": "backend"
   },
   "emulators": {
     "functions": {
@@ -19,6 +19,7 @@
     }
   },
   "hosting": {
+    "target": "frontend",
     "public": "build",
     "ignore": [
       "firebase.json",

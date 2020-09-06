@@ -5,8 +5,8 @@
   "targets": {
     "zoomers-fudging-rt": {
       "hosting": {
-        "backend": [
-          "zoomers-fudging-rt"
+        "frontend": [
+          "zoomers-rt-frontend"
         ]
       }
     }
