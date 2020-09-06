@@ -1,72 +1,179 @@
-// Utilities -- JS weaknesses, eh
-const quickObjEmptyCheck = ( obj ) => {
-  for ( var key in obj ) {
-    if( obj.hasOwnProperty( key ) )
+const manageDbData = async ( 
+  db, 
+  key, 
+  value, 
+  handle, 
+  toKeep = true 
+) => {
+  // Blank ids are the main reason for this
+  console.log( 'key', key );
+  console.log( 'value', value );
+
+  if ( !!value ) return false;
+
+  const currFunc = 'manageDbData()';
+
+  // Not including users based on regex blocklist
+  const regexArr = [
+    /squad\+/, 
+    /hackathon/, 
+    /^chat:.+/, 
+    /[\s]chat/, 
+    /.\(chat\)/ 
+  ];
+  
+  regexArr.map( solo => {
+    if ( ( new RegExp( solo, 'i' ) ).test( handle ) ) {
       return false;
+    };
+  } );
+
+  // Adjustments for some users.
+  // The initial name for some are too generic or incorrect
+  const adjustmentRegex = [
+    // @TODO is colin and monika exactly like i have it?
+	  { og: 'Colin and Monika', adjustment: 'Stephanie' }, 
+	  { og: 'M L', adjustment: 'Michelle L' } 
+  ];
+
+  adjustmentRegex.map( solo => {
+    if ( solo.og === handle ) handle = solo.adjustment;
+  } );
+
+  // Limiting personal info
+  // First name + any other parts of name with only first letter
+  const handlingArr = handle.split( ' ' );
+
+  handlingArr.map( ( individualWords, index ) => {
+    // Skip first name + skip cropping last word if in parenthesis
+    // Many times parenthesis is for pronouns
+    if ( 
+      ( index === 0 ) 
+      || 
+      ( 
+        index === handlingArr.length - 1 
+        && 
+        ( 
+          ( 
+            individualWords.slice( 0, 1 ) === '(' 
+            && 
+            individualWords.slice( -1 ) === ')' 
+          )
+          || 
+          (
+            individualWords.slice( 0, 1 ) === '[' 
+            && 
+            individualWords.slice( -1 ) === ']' 
+          )
+        )
+      )
+    ) {
+      return individualWords;
+    };
+    // Otherwise only keep first character of word
+    return individualWords.slice( 0, 1 );
+  } );
+
+  const finalFormName = handlingArr.join( ' ' );
+
+  // Grabbing the name if it is already in the collection as a document
+  const ref = db
+    .collection( 'log' );
+
+  // Trying to grab value from db.
+  // In 2020-09, it is either id or user_id
+  const queryRef = await ref
+    .where( key, '==', value )
+    .where( online, '==', true )
+    .limit( 1 );
+
+  // Change online status to offline if not removing
+  // If removing, whole doc is deleted or given some other designation
+  if ( query.exists ) {
+    if ( toKeep ) {
+      return queryRef.update( {
+        online: false 
+      } );
+    } else {
+      // If removing, whole doc is deleted or given some other designation
+      return queryRef.update( {
+        online: false, 
+        dupe: true 
+       } );
+    };
+    // No found value
+  } else if ( !query.exists ) { 
+    console.log( `${ currFunc }: ${ key } -- no where query found` );
+    return `${ currFunc }: ${ key } -- no where query found`;
   };
-  return true;
-};
-o
-const prepData = async ( db ) => {
-  const doc = db.collection( 'online' ).doc( 'now' );
-  const fbData = await doc.get();
-  let data = fbData.data().list;
-  return { doc, data };
 };
 
-const removeSameValueFromDb = async ( doc, data, key, value, remove = false ) => {
-  // Blank ids are the main reason for this
-  if ( !!value ) return;
-  console.log( "removeSameValueFromDb(): ${ key }, remove: ${ remove }" );
-  const removalIndex = data.findIndex( han => han[ key ] === value );
-  // Not found
-  if ( removalIndex === -1 ) {
-    if ( key === 'id' ) {
-      console.log( 'removeSameValueFromDb(): id -- no removal index' );
-    } else if ( key === 'user_id' ) {
-      console.log( 'removeSameValueFromDb(): user_id -- no removal index' );
-    };
-    return;
-  } else {
-    console.log( 'removeSameValueFromDb(): removalIndex', removalIndex );
+// @@called 1x in Functions.js
+const pushPersonToDb = async ( 
+  db, 
+  userId, 
+  justId, 
+  userName 
+) => {
+  // Remove id or user_id that are online. User is going online now. How can there be another instance of them online, fam?
+  await falsifyOnlineStatus( 
+    db, 
+    userId, 
+    justId, 
+    userName,  
+    false 
+  );
+  
+  // Add new fields to user
+  newUser = { 
+    userId, 
+    justId, 
+    handle: userName, 
+    timestamp: Date.now(), 
+    online: true, 
+    dupe: false 
+  };
+
+  const ref = db
+    .collection( 'log' );
+
+  ref
+    .doc()
+    .set( 
+      { ...newUser } 
+    );
+};
+
+// @@called 1x in Functions.js
+const falsifyOnlineStatus = async ( 
+  db, 
+  userId, 
+  justId, 
+  handle, 
+  toKeep = true 
+) => { 
+  if ( userId ) {
+    await manageDbData( 
+      db, 
+      'userId', 
+      userId, 
+      handle, 
+      toKeep 
+    );
   };
   
-  // Changing field vs actually deleting
-  if ( remove ) {
-    const minusRemoval = data.splice( removalIndex, 1 );
-    if ( quickObjEmptyCheck( minusRemoval ) ) return;
-    console.log( 'removeSameValueFromDb(): deleting the value ${ removalindex }' );
-  } else {
-    const tmp = data[ removalIndex ];
-    console.log( 'tmp1', tmp );
-    tmp.online = false;
-    console.log( 'tmp2', tmp );
-    data[ removalIndex ] = tmp;
-    console.log( 'removeSameValueFromDb(): online status changed for ${ removalindex }' );
+  if ( justId ) {
+    await manageDbData( 
+      db, 
+      'justId', 
+      justId, 
+      handle, 
+      toKeep 
+    );
   };
-  console.log( 'hi3', data[ removalIndex ] );
-  doc.set( { list: data } );
-};
-
-// Firebase functions
-const pushToDb = async ( db, newUser, justId ) => {
-  let { doc, data } = await prepData( db );
-  if ( !data || quickObjEmptyCheck( data ) ) { data = [] };  
-  newUser.timestamp = Date.now();
-  newUser.online = true;
-  console.log( 'pushToDb(): got close to end' );
-  doc.set( { list: [ newUser, ...data ] } );
-};
-
-const removeFromDb = async ( db, userId, justId ) => {
-  let { doc, data } = await prepData( db );
-  if ( !data || quickObjEmptyCheck( data ) ) return;
-  await removeSameValueFromDb( doc, data, 'id', justId, true );
-  await removeSameValueFromDb( doc, data, 'user_id', userId, true );
 };
 
 module.exports = {
-  quickObjEmptyCheck, 
-  pushToDb, 
-  removeFromDb 
+  pushPersonToDb, 
+  falsifyOnlineStatus 
 };

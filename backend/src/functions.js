@@ -4,9 +4,8 @@ const functions = require( 'firebase-functions' );
 
 const db = require( './firebase' );
 const config = require( './config' );
-const { quickObjEmptyCheck, 
-        pushToDb, 
-        removeFromDb  
+const { pushPersonToDb, 
+        falsifyOnlineStatus   
       } = require( './dbUtilities' );
 
 const app = express();
@@ -55,10 +54,10 @@ app.post( '/', ( req, res ) => {
   // Add or remove from firebase
   if ( zoomEvent === 'meeting.participant_joined' ) {
     console.log( 'meeting.participant_joined' );
-    pushToDb( db, userInfo, userInfo.id );
+    pushPersonToDb( db, userInfo );
   } else if ( zoomEvent === 'meeting.participant_left' ) {
     console.log( 'meeting.participant_left' );
-    removeFromDb( db, userInfo.user_id, userInfo.id );
+    falsifyOnlineStatus( db, userInfo.user_id, userInfo.id );
   };
 } );
 
