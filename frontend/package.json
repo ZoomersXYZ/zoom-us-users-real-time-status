@@ -17,8 +17,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "deploy": "npx firebase deploy",
-    "buploy": "yarn build && yarn deploy", 
-    "buildyy": "react-scripts build && npx copyfiles \"build/**\" ../backend" 
+    "buploy": "yarn build && yarn deploy",
+    "buildyy": "react-scripts build && npx copyfiles \"build/**\" ../backend"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -35,7 +35,5 @@
       "last 1 safari version"
     ]
   },
-  "devDependencies": {
-    "copyfiles": "^2.3.0"
-  }
+  "devDependencies": {}
 }
