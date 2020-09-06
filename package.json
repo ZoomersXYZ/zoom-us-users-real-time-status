@@ -26,17 +26,16 @@
   "author": "Saadh Shehzad",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1",
-    "firebase-admin": "^8.0.0",
-    "firebase-functions": "^3.8.0", 
-
     "date-fns": "^2.15.0",
+    "express": "^4.17.1",
     "firebase": "^7.16.1",
+    "firebase-admin": "^8.0.0",
+    "firebase-functions": "^3.8.0",
     "node-sass": "^4.14.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-firebase-hooks": "^2.2.0",
-    "react-scripts": "3.4.1" 
+    "react-scripts": "3.4.1"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -54,8 +53,10 @@
     ]
   },
   "devDependencies": {
+    "customize-cra": "^1.0.0",
     "eslint": "^6.8.0",
     "eslint-plugin-node": "^11.0.0",
-    "firebase-tools": "^8.6.0"
+    "firebase-tools": "^8.6.0",
+    "react-app-rewired": "^2.1.6"
   }
 }
