@@ -6,11 +6,12 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon src/app.js",
-    "serve": "npx firebase emulators:start --only functions",
+    "serve": "npx firebase emulators:start",
     "debug": "npx firebase emulators:start --inspect-functions=12345",
     "shell": "npx firebase functions:shell",
     "f-start": "npm run shell",
-    "deploy": "npx firebase deploy --only functions",
+    "f-deploy": "npx firebase deploy --only functions",
+    "deploy": "npx firebase deploy",
     "logs": "npx firebase functions:log"
   },
   "engines": {
