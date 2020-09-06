@@ -85,3 +85,4 @@ node_modules/
 
 # project specific
 /src/backend/config
+/src/app/config
