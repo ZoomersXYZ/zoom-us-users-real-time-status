@@ -18,7 +18,7 @@ app.get( '/', ( request, response ) => {
 
 // Main function
 app.post( '/', ( req, res ) => {
-  const data = JSON.stringify( req.body );  
+  const data = JSON.stringify( req.body );
   let event = JSON.parse( data );
   try {
     event = JSON.parse( event );
@@ -38,12 +38,19 @@ app.post( '/', ( req, res ) => {
 
   const zoomEvent = event.event;
   const parent = event.payload && event.payload.object;
+  const meetingId = parent && parent.hasOwnProperty( 'id' ) && parent.id;
   const userInfo = parent && parent.hasOwnProperty( 'participant' ) && parent.participant;
   
   // For logs
   console.log( 'parent', parent );
   console.log( 'zoom event', zoomEvent );
+  console.log( 'meeting ID', meetingId );
   console.log( 'userInfo', userInfo );
+
+  if ( meetingId !== config.ROOM_ID ) {
+    console.warn( 'incorrect meeting id' );
+    return;
+  };
 
   // Add or remove from firebase
   if ( zoomEvent === 'meeting.participant_joined' ) {
