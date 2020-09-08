@@ -1,3 +1,9 @@
+const checkStartAndEndOfString = ( str, start, end ) => (
+  str.slice( 0, 1 ) === start 
+  && 
+  str.slice( -1 ) === end 
+);
+
 const manageDbData = async ( 
   db, 
   key, 
@@ -10,7 +16,7 @@ const manageDbData = async (
   console.log( 'value', value );
 
   if ( !!value ) return false;
-
+  // for logs
   const currFunc = 'manageDbData()';
 
   // Not including users based on regex blocklist
@@ -54,17 +60,11 @@ const manageDbData = async (
         index === handlingArr.length - 1 
         && 
         ( 
-          ( 
-            individualWords.slice( 0, 1 ) === '(' 
-            && 
-            individualWords.slice( -1 ) === ')' 
-          )
+          checkStartAndEndOfString( individualWords,'(', ')' )
           || 
-          (
-            individualWords.slice( 0, 1 ) === '[' 
-            && 
-            individualWords.slice( -1 ) === ']' 
-          )
+          checkStartAndEndOfString( individualWords,'[', ']' )
+          ||
+          checkStartAndEndOfString( individualWords,'-', '-' )
         )
       )
     ) {
@@ -83,13 +83,13 @@ const manageDbData = async (
   // Trying to grab value from db.
   // In 2020-09, it is either id or user_id
   const queryRef = await ref
-    .where( key, '==', value )
-    .where( online, '==', true )
+    .where( key, '==', finalFormName )
+    .where( 'online', '==', true )
     .limit( 1 );
 
   // Change online status to offline if not removing
   // If removing, whole doc is deleted or given some other designation
-  if ( query.exists ) {
+  if ( queryRef.exists ) {
     if ( toKeep ) {
       return queryRef.update( {
         online: false 
@@ -102,9 +102,8 @@ const manageDbData = async (
        } );
     };
     // No found value
-  } else if ( !query.exists ) { 
+  } else if ( !queryRef.exists ) { 
     console.log( `${ currFunc }: ${ key } -- no where query found` );
-    return `${ currFunc }: ${ key } -- no where query found`;
   };
 };
 
