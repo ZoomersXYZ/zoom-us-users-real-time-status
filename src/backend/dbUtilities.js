@@ -28,23 +28,28 @@ const manageDbData = async (
     /.\(chat\)/ 
   ];
   
-  regexArr.map( solo => {
-    if ( ( new RegExp( solo, 'i' ) ).test( handle ) ) {
-      return false;
-    };
-  } );
+  const regexResult = regexArr.find( solo => 
+    ( new RegExp( solo, 'i' ) ).test( handle ) 
+   );
+   if ( regexResult ) return false;
 
   // Adjustments for some users.
   // The initial name for some are too generic or incorrect
   const adjustmentRegex = [
     // @TODO is colin and monika exactly like i have it?
-	  { og: 'Colin and Monika', adjustment: 'Stephanie' }, 
-	  { og: 'M L', adjustment: 'Michelle L' } 
+	  { argot: 'Colin and Monika', proper: 'Stephanie' }, 
+    { argot: 'M L', proper: 'Michelle L' } 
+    
   ];
 
-  adjustmentRegex.map( solo => {
-    if ( solo.og === handle ) handle = solo.adjustment;
-  } );
+  let adjustedValue = adjustmentRegex.find( solo => 
+    ( solo.argot === handle )
+  );
+  if ( adjustedValue ) {
+    handle = adjustedValue.proper;
+  } else {
+    adjustedValue = { argot: null };
+  }
 
   // Limiting personal info
   // First name + any other parts of name with only first letter
@@ -105,6 +110,11 @@ const manageDbData = async (
   } else if ( !queryRef.exists ) { 
     console.log( `${ currFunc }: ${ key } -- no where query found` );
   };
+
+  return { 
+    handle: finalFormName, 
+    argot: adjustedValue.argot 
+  };
 };
 
 // @@called 1x in Functions.js
@@ -115,7 +125,7 @@ const pushPersonToDb = async (
   userName 
 ) => {
   // Remove id or user_id that are online. User is going online now. How can there be another instance of them online, fam?
-  await falsifyOnlineStatus( 
+  const { handle, argot } = await falsifyOnlineStatus( 
     db, 
     userId, 
     justId, 
@@ -124,10 +134,11 @@ const pushPersonToDb = async (
   );
   
   // Add new fields to user
-  newUser = { 
+  const newUser = { 
     userId, 
     justId, 
-    handle: userName, 
+    handle, 
+    argot, 
     timestamp: Date.now(), 
     online: true, 
     dupe: false 
@@ -152,17 +163,15 @@ const falsifyOnlineStatus = async (
   toKeep = true 
 ) => { 
   if ( userId ) {
-    await manageDbData( 
+    return await manageDbData( 
       db, 
       'userId', 
       userId, 
       handle, 
       toKeep 
     );
-  };
-  
-  if ( justId ) {
-    await manageDbData( 
+  } else if ( justId ) {
+    return await manageDbData( 
       db, 
       'justId', 
       justId, 
