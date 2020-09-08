@@ -1,0 +1,30 @@
+{
+  "name": "Zoomus-Meetings-Webinar-Realtime-Users-Webhook-Backend",
+  "version": "0.9.1",
+  "description": "",
+  "private": false,
+  "main": "functions.js",
+  "scripts": {
+    "serve": "npx firebase emulators:start",
+    "debug": "npx firebase emulators:start --inspect-functions=12345",
+    "shell": "npx firebase functions:shell",
+    "b-shell": "npm run shell",
+    "logs": "npx firebase functions:log",
+    "deploy": "npx firebase deploy --only functions" 
+  },
+  "engines": {
+    "node": "12"
+  },
+  "author": "Saadh Shehzad",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.17.1",
+    "firebase-admin": "^8.0.0",
+    "firebase-functions": "^3.8.0" 
+  },
+  "devDependencies": {
+    "eslint": "^6.8.0",
+    "eslint-plugin-node": "^11.0.0",
+    "firebase-tools": "^8.6.0" 
+  }
+}

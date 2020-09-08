@@ -1,7 +1,7 @@
 {
   "functions": {
     "target": "backend",
-    "source": "backend"
+    "source": "src/backend"
   },
   "emulators": {
     "functions": {
