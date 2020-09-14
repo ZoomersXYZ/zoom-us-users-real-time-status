@@ -7,6 +7,7 @@
     "serve": "npx firebase emulators:start",
     "build-serve": "react-app-rewired build && npx firebase emulators:start",
     "debug": "npx firebase emulators:start --inspect-functions=12345",
+    "build-debug": "react-app-rewired build && npx firebase emulators:start --inspect-functions=12345",
     "shell": "npx firebase functions:shell",
     "b-shell": "npm run shell",
     "logs": "npx firebase functions:log",
