@@ -11,18 +11,23 @@ const manageDbData = async (
   handle, 
   toKeep = true 
 ) => {
-  // Blank ids are the main reason for this
-  console.log( 'key', key );
-  console.log( 'value', value );
-
-  if ( !!value ) return false;
   // for logs
   const currFunc = 'manageDbData()';
+
+  console.log( 'key, value, handle', `${ currFunc }: ${ key }, ${ value }, ${ handle }` );
+
+  // Blank ids are the main reason for this
+  if ( !value ) {
+    console.warn( `${ currFunc }: value is falsey. RETURNING. ` )
+    return false;
+  };
 
   // Not including users based on regex blocklist
   const regexArr = [
     /squad\+/, 
     /hackathon/, 
+    /workathon/, 
+    /zoomathon/, 
     /^chat:.+/, 
     /[\s]chat/, 
     /.\(chat\)/ 
@@ -31,7 +36,10 @@ const manageDbData = async (
   const regexResult = regexArr.find( solo => 
     ( new RegExp( solo, 'i' ) ).test( handle ) 
    );
-   if ( regexResult ) return false;
+   if ( regexResult ) {
+     console.warn( `${ currFunc }: blocklist regex is truthy. RETURNING. ` )
+     return false;
+   };
 
   // Adjustments for some users.
   // The initial name for some are too generic or incorrect
@@ -39,7 +47,6 @@ const manageDbData = async (
     // @TODO is colin and monika exactly like i have it?
 	  { argot: 'Colin and Monika', proper: 'Stephanie' }, 
     { argot: 'M L', proper: 'Michelle L' } 
-    
   ];
 
   let adjustedValue = adjustmentRegex.find( solo => 
@@ -49,7 +56,7 @@ const manageDbData = async (
     handle = adjustedValue.proper;
   } else {
     adjustedValue = { argot: null };
-  }
+  };
 
   // Limiting personal info
   // First name + any other parts of name with only first letter
@@ -88,29 +95,38 @@ const manageDbData = async (
   // Trying to grab value from db.
   // In 2020-09, it is either id or user_id
   const queryRef = await ref
-    .where( key, '==', finalFormName )
+    .where( key, '==', value )
     .where( 'online', '==', true )
+    // does limit matter? What if something gets disrupted and there's multiple? Guess i can see about that later
     .limit( 1 );
 
-  // Change online status to offline if not removing
-  // If removing, whole doc is deleted or given some other designation
-  if ( queryRef.exists ) {
-    if ( toKeep ) {
-      return queryRef.update( {
-        online: false 
-      } );
-    } else {
-      // If removing, whole doc is deleted or given some other designation
-      return queryRef.update( {
-        online: false, 
-        dupe: true 
-       } );
-    };
-    // No found value
-  } else if ( !queryRef.exists ) { 
-    console.log( `${ currFunc }: ${ key } -- no where query found` );
-  };
+    const querySnapshot = await queryRef.get();   
 
+    let queryDoc = {};
+    if ( !querySnapshot.empty && querySnapshot.size === 1 ) {
+      queryDoc = querySnapshot.docs[ 0 ];
+
+      // Change online status to offline if not removing
+      // If removing, whole doc is deleted or given some other designation
+      console.warn( `${ currFunc }: queryRef exists. one of two possible returns happening next. ` )
+      if ( toKeep ) {
+        console.warn( `${ currFunc }: toKeep is truthy. Setting online to false. ` )
+        queryDoc.ref.update( {
+          online: false 
+        } );
+      } else {
+        // If removing, whole doc is deleted or given some other designation
+        console.warn( `${ currFunc }: toKeep is falsey. Setting online to false + dupe to true.` )
+        queryDoc.ref.update( {
+          online: false, 
+          dupe: true 
+        } );
+      };
+    } else { 
+      console.warn( `${ currFunc }: ${ key } == ${ value } -- where query not found` );
+    };
+
+  console.warn( `${ currFunc }: Returning: handle: ${ finalFormName }, argot:${ adjustedValue.argot }` );
   return { 
     handle: finalFormName, 
     argot: adjustedValue.argot 
@@ -125,14 +141,16 @@ const pushPersonToDb = async (
   userName 
 ) => {
   // Remove id or user_id that are online. User is going online now. How can there be another instance of them online, fam?
-  const { handle, argot } = await falsifyOnlineStatus( 
+  const result = await falsifyOnlineStatus( 
     db, 
     userId, 
     justId, 
-    userName,  
+    userName, 
     false 
   );
-  
+  if ( !result ) return false;
+  const { handle, argot } = result;
+
   // Add new fields to user
   const newUser = { 
     userId, 
@@ -143,6 +161,7 @@ const pushPersonToDb = async (
     online: true, 
     dupe: false 
   };
+  console.log( `pushPerstonToDB(): newUser obj: ${ JSON.stringify( newUser ) }` );
 
   const ref = db
     .collection( 'log' );
@@ -152,6 +171,7 @@ const pushPersonToDb = async (
     .set( 
       { ...newUser } 
     );
+  console.log( 'pushPerstonToDB(): ref set - not checking tho. what does it return?' );
 };
 
 // @@called 1x in Functions.js

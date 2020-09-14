@@ -21,9 +21,9 @@ app.post( '/', ( req, res ) => {
   let event = JSON.parse( data );
   try {
     event = JSON.parse( event );
-    console.log( 'yes for 2nd JSON.parse' );
+    console.info( 'yes for 2nd JSON.parse' );
   } catch { 
-    console.log( 'nope for 2nd JSON.parse' );
+    console.info( 'nope for 2nd JSON.parse' );
   };
 
   if ( req.headers.authorization === config.VERIFICATION_TOKEN ) {
@@ -31,7 +31,7 @@ app.post( '/', ( req, res ) => {
     console.log( 'Meeting/Webinar webhook sending back 200.' );
     res.send();
   } else {
-    console.warn( 'Authorization no good' );
+    console.error( 'Authorization no good' );
     return;
   };
 
@@ -42,22 +42,18 @@ app.post( '/', ( req, res ) => {
   
   // For logs
   console.log( 'parent', parent );
-  console.log( 'zoom event', zoomEvent );
-  console.log( 'meeting ID', meetingId );
-  console.log( 'userInfo', userInfo );
+  console.log( 'meeting ID + zoom event', `${ meetingId } + ${ zoomEvent }` );
 
   if ( meetingId !== config.ROOM_ID ) {
-    console.warn( 'incorrect meeting id' );
+    console.error( 'incorrect meeting id' );
     return;
   };
 
   // Add or remove from firebase
   if ( zoomEvent === 'meeting.participant_joined' ) {
-    console.log( 'meeting.participant_joined' );
-    pushPersonToDb( db, userInfo );
+    pushPersonToDb( db, userInfo.user_id, userInfo.id, userInfo.user_name );
   } else if ( zoomEvent === 'meeting.participant_left' ) {
-    console.log( 'meeting.participant_left' );
-    falsifyOnlineStatus( db, userInfo.user_id, userInfo.id );
+    falsifyOnlineStatus( db, userInfo.user_id, userInfo.id, userInfo.user_name );
   };
 } );
 
