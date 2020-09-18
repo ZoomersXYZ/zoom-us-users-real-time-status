@@ -4,6 +4,18 @@ const checkStartAndEndOfString = ( str, start, end ) => (
   str.slice( -1 ) === end 
 );
 
+const personQueryRef = async ( ref, name ) => {
+  const personRef = ref 
+    .where( 'name', '==', name ) 
+    .limit( 1 );
+  return await personRef.get();
+};
+
+const personLogCollectionRef = ( ref, docId ) => 
+    ref
+      .doc( docId )
+      .collection( 'rt_log' );
+
 const manageDbData = async ( 
   db, 
   key, 
@@ -88,48 +100,77 @@ const manageDbData = async (
 
   const finalFormName = handlingArr.join( ' ' );
 
+
+  ////
+  // Firestore work
+  ////
+
   // Grabbing the name if it is already in the collection as a document
   const ref = db
-    .collection( 'log' );
+    .collection( 'people' );
 
-  // Trying to grab value from db.
-  // In 2020-09, it is either id or user_id
-  const queryRef = await ref
-    .where( key, '==', value )
-    .where( 'online', '==', true )
-    // does limit matter? What if something gets disrupted and there's multiple? Guess i can see about that later
-    .limit( 1 );
+  // const personRef = ref 
+  //   .where( 'name', '==', finalFormName ) 
+  //   .limit( 1 );
+  // const personSnapshot = await personRef.get();
+  const personSnapshot = await personQueryRef( ref, finalFormName );
 
-    const querySnapshot = await queryRef.get();   
+  if ( personSnapshot.empty ) {
+    await ref.doc().set( {
+      name: finalFormName, 
+      created_at: Date.now(), 
+      userId: key === 'userId' ? value : null 
+    } );
+  };
+  
+  const personSnapshotDeux = await personQueryRef( ref, finalFormName );
+  // this should alwyas be true
+  // Made above if not already true
+  let personFireId = '';
+  let keep = true;
+  if ( !personSnapshotDeux.empty && personSnapshotDeux.size === 1 ) {
+    const personDoc = personSnapshotDeux.docs[ 0 ];
 
-    let queryDoc = {};
-    if ( !querySnapshot.empty && querySnapshot.size === 1 ) {
-      queryDoc = querySnapshot.docs[ 0 ];
+    // Trying to grab value from db.
+    // In 2020-09, it is either id or user_id
+    personFireId = personDoc.id;
+    const nestedCollectionRef = personLogCollectionRef( ref, personFireId );      
+    const subCollectionQueryRef = await nestedCollectionRef
+      .where( key, '==', value )
+      .where( 'online', '==', true )
+      .limit( 1 );
+  
+    const subCollectionQuerySnapshot = await subCollectionQueryRef.get();
 
+    if ( !subCollectionQuerySnapshot.empty && subCollectionQuerySnapshot.size === 1 ) {
+      const queryDoc = subCollectionQuerySnapshot.docs[ 0 ];
+  
       // Change online status to offline if not removing
       // If removing, whole doc is deleted or given some other designation
-      console.warn( `${ currFunc }: queryRef exists. one of two possible returns happening next. ` )
+      console.warn( `${ currFunc }: queryRef exists. one of two possible returns happening next. ` );
       if ( toKeep ) {
-        console.warn( `${ currFunc }: toKeep is truthy. Setting online to false. ` )
+        console.warn( `${ currFunc }: toKeep is truthy. Setting online to false. ` );
         queryDoc.ref.update( {
           online: false 
         } );
+        keep = true;
       } else {
         // If removing, whole doc is deleted or given some other designation
-        console.warn( `${ currFunc }: toKeep is falsey. Setting online to false + dupe to true.` )
-        queryDoc.ref.update( {
-          online: false, 
-          dupe: true 
-        } );
+        console.warn( `${ currFunc }: toKeep is falsey. Setting new doc online to false + dupe to true.` );
+        keep = false;
       };
     } else { 
       console.warn( `${ currFunc }: ${ key } == ${ value } -- where query not found` );
     };
+  };
+
 
   console.warn( `${ currFunc }: Returning: handle: ${ finalFormName }, argot:${ adjustedValue.argot }` );
   return { 
+    nestedRefId: personFireId, 
     handle: finalFormName, 
-    argot: adjustedValue.argot 
+    argot: adjustedValue.argot, 
+    keep 
   };
 };
 
@@ -149,7 +190,7 @@ const pushPersonToDb = async (
     false 
   );
   if ( !result ) return false;
-  const { handle, argot } = result;
+  const { handle, argot, nestedRefId, keep } = result;
 
   // Add new fields to user
   const newUser = { 
@@ -158,15 +199,16 @@ const pushPersonToDb = async (
     handle, 
     argot, 
     timestamp: Date.now(), 
-    online: true, 
-    dupe: false 
+    online: !!keep, 
+    dupe: !keep 
   };
   console.log( `pushPerstonToDB(): newUser obj: ${ JSON.stringify( newUser ) }` );
 
   const ref = db
-    .collection( 'log' );
+    .collection( 'people' );
+  const logRef = personLogCollectionRef( ref, nestedRefId );
 
-  ref
+  logRef
     .doc()
     .set( 
       { ...newUser } 
