@@ -24,12 +24,23 @@ const List = () => {
     // Core
     const d = new Date();
     const oneDayAgo = d.setDate( d.getDate() - 1000 * 60 * 60 * 24 );
-    const stream = db.collection( 'log' ) 
+    // .where('type', '==', 'museum');
+    // const stream = db.collection( 'log' ) 
+    const stream = db.collectionGroup( 'rt_log' )
       .where( 'timestamp', '>', oneDayAgo ) 
       .where( 'dupe', '==', false ) 
       .orderBy( 'timestamp', 'desc' ) 
       .onSnapshot( 
         doc => {
+          doc.docChanges().forEach( ( change ) => {
+            if ( change.type === 'added' ) {
+              console.log( 'New city: ', change.doc.data() );
+            } else if ( change.type === 'modified' ) {
+              console.log( 'Modified city: ', change.doc.data() );
+            } else if ( change.type === 'removed' ) {
+              console.log( 'Removed city: ', change.doc.data() );
+            };
+          } );
           setLoading( false );
           const arr = [];
           doc.forEach( solo => arr.push( solo.data() ) );
