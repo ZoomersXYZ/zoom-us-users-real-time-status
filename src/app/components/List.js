@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 
 import db from '../config/firebase';
 import UsersList from './UsersList';
+import { sub } from 'date-fns'
 
 // import { useDocuments } from 'react-firebase-hooks/firestore';
 
@@ -22,8 +23,9 @@ const List = () => {
   
   useEffect( () => {
     // Core
-    const d = new Date();
-    const oneDayAgo = d.setDate( d.getDate() - 1000 * 60 * 60 * 24 );
+    const oneDayAgo = sub( new Date(), {
+      days: 1 
+    } ).getTime();
     // .where('type', '==', 'museum');
     // const stream = db.collection( 'log' ) 
     const stream = db.collectionGroup( 'rt_log' )
