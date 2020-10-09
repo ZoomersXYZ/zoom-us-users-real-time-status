@@ -8,7 +8,7 @@ import EachUser from './EachUser';
 const List = () => {
     const oneDayAgo = sub( new Date(), {
       days: 1 
-    } );
+    } ).getTime();
     const [ value, loading, error ] = useDocumentData(
       db.collectionGroup( 'rt_log' )
         .where( 'timestamp', '>', oneDayAgo )
