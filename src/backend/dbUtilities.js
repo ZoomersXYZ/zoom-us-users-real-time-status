@@ -37,9 +37,7 @@ const manageDbData = async (
   // Not including users based on regex blocklist
   const regexArr = [
     /squad\+/, 
-    /hackathon/, 
-    /workathon/, 
-    /zoomathon/, 
+    /(work|hack|zoom)-?a-?thon/, 
     /^chat:.+/, 
     /[\s]chat/, 
     /.\(chat\)/ 
@@ -109,10 +107,6 @@ const manageDbData = async (
   const ref = db
     .collection( 'people' );
 
-  // const personRef = ref 
-  //   .where( 'name', '==', finalFormName ) 
-  //   .limit( 1 );
-  // const personSnapshot = await personRef.get();
   const personSnapshot = await personQueryRef( ref, finalFormName );
 
   if ( personSnapshot.empty ) {

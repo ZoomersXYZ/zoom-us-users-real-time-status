@@ -8,9 +8,9 @@ import List from './components/List';
 const App = () => (
   <div className="App">
     <header className="App-header">
-      <h1>
-        Zoomers Real-Time Status
-      </h1>
+      <h5>
+        Zoomers Real-Time Status of Zoom Room
+      </h5>
     </header>
     <List />
   </div>
