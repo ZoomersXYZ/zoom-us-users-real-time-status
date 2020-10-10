@@ -17,17 +17,37 @@ const List = () => {
     const stream = db.collectionGroup( 'rt_log' )
       .where( 'timestamp', '>', oneDayAgo ) 
       .where( 'dupe', '==', false ) 
-      .orderBy( 'timestamp', 'desc' ) 
+      .orderBy( 'timestamp', 'asc' ) 
       .onSnapshot( 
         doc => {
           doc.docChanges().forEach( ( change ) => {
             if ( change.type === 'added' ) {
-              // console.log( 'New city: ', change.doc.data() );
-              setList( prev => {
-                prev.push( change.doc.data() );
-                return prev;
-                } );
-            }            
+              setList( prevState => 
+                [ change.doc.data(), ...prevState ] 
+              );
+            } else if ( change.type === 'modified' ) {
+              setList( prevState => {
+                const updated = change.doc.data();
+                const prevIndex = prevState.findIndex( solo => 
+                  solo.userId === change.doc.data().userId 
+                );
+                return [ 
+                  ...prevState.slice( 0, prevIndex ), 
+                  updated, 
+                  ...prevState.slice( prevIndex + 1 ) 
+                ];
+              } );
+            } else if ( change.type === 'removed' ) {
+              setList( prevState => {
+                const prevIndex = prevState.findIndex( solo => 
+                  solo.userId === change.doc.data().userId 
+                );
+                return [ 
+                  ...prevState.slice( 0, prevIndex ), 
+                  ...prevState.slice( prevIndex + 1 ) 
+                ];
+              } );
+            };
           } );
           setLoading( false );
         },
