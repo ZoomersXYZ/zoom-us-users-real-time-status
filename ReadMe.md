@@ -1,0 +1,2 @@
+# zoom-us-users-real-time-status
+Zoom.us real time status of people/users in a meeting or webinar using Zoom's webhook API, Google Firebase Firestore and Cloud Functions. React frontend, Node.js Express backend. Pretty minimal code. The React part is mostly unnecessary as it's so little code.

@@ -62,8 +62,8 @@ const List = () => {
 
   return (
     <div>
-      { loading 
-        && <span>Loading...</span> 
+      { loading && 
+        <span>Loading...</span> 
       }
       { error && 
         <span>{ error }</span> 
@@ -75,7 +75,7 @@ const List = () => {
         <ul className="user-list">
           { !!list && list.map( ( aUser, index ) => 
             <EachUser 
-              key={ `auser-${ index }` } 
+              key={ `aUser-${ index }` } 
               aUser={ aUser } 
             />
           ) }

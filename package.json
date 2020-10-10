@@ -13,6 +13,7 @@
     "logs": "npx firebase functions:log",
     "deploy": "npx firebase deploy",
     "b-deploy": "react-app-rewired build && npx firebase deploy",
+    "w-deploy": "react-app-rewired build && npx firebase deploy --only hosting",
     "f-deploy": "npx firebase deploy --only functions",
     "start": "react-app-rewired start",
     "build": "react-app-rewired build",
