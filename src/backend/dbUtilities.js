@@ -121,6 +121,7 @@ const manageDbData = async (
   // Made above if not already true
   let personFireId = '';
   let keep = true;
+  let online = true;
   if ( !personSnapshotDeux.empty && personSnapshotDeux.size === 1 ) {
     const personDoc = personSnapshotDeux.docs[ 0 ];
 
@@ -141,32 +142,33 @@ const manageDbData = async (
       // Change online status to offline if not removing
       // If removing, whole doc is deleted or given some other designation
       console.warn( `${ currFunc }: queryRef exists. one of two possible returns happening next. ` );
+
       if ( toKeep ) {
-        console.warn( `${ currFunc }: toKeep is truthy. Setting online to false. ` );
+        console.warn( `${ currFunc }: toKeep is truthy. Setting online to false. ` );      
         queryDoc.ref.update( {
           online: false 
         } );
-        keep = true;
       } else {
+        // This is  for debugging purposes
+
         // If removing, whole doc is deleted or given some other designation
         console.warn( `${ currFunc }: toKeep is falsey. Setting new doc online to false + dupe to true.` );
-        queryDoc.ref.update( {
-          online: false 
-        } );
         keep = false;
+        online = null;
       };
+
+      console.warn( `${ currFunc }: Returning: handle: ${ finalFormName }, argot:${ adjustedValue.argot }` );
+      return { 
+        nestedRefId: personFireId, 
+        handle: finalFormName, 
+        argot: adjustedValue.argot, 
+        keep, 
+        online 
+      };
+
     } else { 
       console.warn( `${ currFunc }: ${ key } == ${ value } -- where query not found` );
     };
-  };
-
-
-  console.warn( `${ currFunc }: Returning: handle: ${ finalFormName }, argot:${ adjustedValue.argot }` );
-  return { 
-    nestedRefId: personFireId, 
-    handle: finalFormName, 
-    argot: adjustedValue.argot, 
-    keep 
   };
 };
 
@@ -175,7 +177,8 @@ const pushPersonToDb = async (
   db, 
   userId, 
   justId, 
-  userName 
+  userName, 
+  toKeep = false 
 ) => {
   // Remove id or user_id that are online. User is going online now. How can there be another instance of them online, fam?
   const result = await falsifyOnlineStatus( 
@@ -183,10 +186,10 @@ const pushPersonToDb = async (
     userId, 
     justId, 
     userName, 
-    false 
+    toKeep
   );
   if ( !result ) return false;
-  const { handle, argot, nestedRefId, keep } = result;
+  const { handle, argot, nestedRefId, keep, online } = result;
 
   // Add new fields to user
   const newUser = { 
@@ -195,7 +198,7 @@ const pushPersonToDb = async (
     handle, 
     argot, 
     timestamp: Date.now(), 
-    online: !!keep, 
+    online: online, 
     dupe: !keep 
   };
   console.log( `pushPerstonToDB(): newUser obj: ${ JSON.stringify( newUser ) }` );
@@ -220,19 +223,19 @@ const falsifyOnlineStatus = async (
   handle, 
   toKeep = true 
 ) => { 
-  if ( userId ) {
-    return await manageDbData( 
-      db, 
-      'userId', 
-      userId, 
-      handle, 
-      toKeep 
-    );
-  } else if ( justId ) {
+  if ( justId ) {
     return await manageDbData( 
       db, 
       'justId', 
       justId, 
+      handle, 
+      toKeep 
+    );
+  } else if ( userId ) {
+    return await manageDbData( 
+      db, 
+      'userId', 
+      userId, 
       handle, 
       toKeep 
     );

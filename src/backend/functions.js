@@ -51,9 +51,9 @@ app.post( '/', ( req, res ) => {
 
   // Add or remove from firebase
   if ( zoomEvent === 'meeting.participant_joined' ) {
-    pushPersonToDb( db, userInfo.user_id, userInfo.id, userInfo.user_name );
+    pushPersonToDb( db, userInfo.user_id, userInfo.id, userInfo.user_name, false );
   } else if ( zoomEvent === 'meeting.participant_left' ) {
-    falsifyOnlineStatus( db, userInfo.user_id, userInfo.id, userInfo.user_name );
+    falsifyOnlineStatus( db, userInfo.user_id, userInfo.id, userInfo.user_name, true );
   };
 } );
 
