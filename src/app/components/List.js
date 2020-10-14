@@ -22,10 +22,12 @@ const List = () => {
         doc => {
           doc.docChanges().forEach( ( change ) => {
             if ( change.type === 'added' ) {
+              // console.log( 'added', change.doc.data() );
               setList( prevState => 
                 [ change.doc.data(), ...prevState ] 
               );
             } else if ( change.type === 'modified' ) {
+              // console.log( 'modified', change.doc.data() );
               setList( prevState => {
                 const updated = change.doc.data();
                 const prevIndex = prevState.findIndex( solo => 
@@ -38,6 +40,7 @@ const List = () => {
                 ];
               } );
             } else if ( change.type === 'removed' ) {
+              console.log( 'removed', change.doc.data() );
               setList( prevState => {
                 const prevIndex = prevState.findIndex( solo => 
                   solo.userId === change.doc.data().userId 
@@ -51,8 +54,8 @@ const List = () => {
           } );
           setLoading( false );
         },
-        err => {
-          console.log( error );
+        err => { 
+          console.log( 'Err:', error );
           setError( error );
         } 
       );
