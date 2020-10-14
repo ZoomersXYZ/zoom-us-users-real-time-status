@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 
 import db from '../config/firebase';
 import EachUser from './EachUser';
-import { sub } from 'date-fns'
+import { sub } from 'date-fns';
+import uniqBy from 'lodash/uniqBy';
 
 const List = () => {
   const [ error, setError ] = useState( false );
@@ -63,6 +64,18 @@ const List = () => {
       // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [] );
 
+  // replace name with justId
+  const totalCount = list && list.length;
+  const totalUniqueCount = list && uniqBy( list ).length;
+
+  const offlineArr = list.filter( han => !han.online );
+  const offlineCount = list && offlineArr.length;
+  const offlineUniqueCount = offlineCount && uniqBy( offlineArr ).length;
+
+  const onlineArr = list.filter( han => han.online );
+  const onlineCount = list && onlineArr.length;
+  const onlineUniqueCount = onlineCount && uniqBy( onlineArr, 'name' ).length;
+
   return (
     <div>
       { loading && 
@@ -71,8 +84,17 @@ const List = () => {
       { error && 
         <span>{ error }</span> 
       }
+      <h2 className="count-header">
+        Real-Time and Past 24 Hours Counts
+      </h2>
       <h3 className="online-count">
-        Online user count: { list && list.filter( han => han.online ).length } 
+        Total: { totalCount }, Unique: { totalUniqueCount } 
+      </h3>
+      <h3 className="online-count">
+        Online (incorrect): { onlineCount }, Unique online people (actual value): { onlineUniqueCount } 
+      </h3>
+      <h3 className="online-count">
+        Total offline: { offlineCount }, Total unique offline: { offlineUniqueCount } 
       </h3>
       <div>
         <ul className="user-list">
