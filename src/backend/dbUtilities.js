@@ -108,12 +108,12 @@ const manageDbData = async (
     .collection( 'people' );
 
   const personSnapshot = await personQueryRef( ref, finalFormName );
-
-  if ( personSnapshot.empty ) {
+  const confirmingLatestIteration = await personSnapshot.get();
+  if ( personSnapshot.empty() || confirmingLatestIteration.docs[ 0 ].data().hasOwnProperty( 'userId' ) ) {
     await ref.doc().set( {
       name: finalFormName, 
       created_at: Date.now(), 
-      userId: key === 'userId' ? value : null 
+      justId: key === 'justId' ? value : null 
     } );
   };
   
