@@ -64,17 +64,16 @@ const List = () => {
       // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [] );
 
-  // replace name with justId
   const totalCount = list && list.length;
-  const totalUniqueCount = list && uniqBy( list ).length;
+  const totalUniqueCount = list && uniqBy( list, 'justId' ).length;
 
   const offlineArr = list.filter( han => !han.online );
   const offlineCount = list && offlineArr.length;
-  const offlineUniqueCount = offlineCount && uniqBy( offlineArr ).length;
+  const offlineUniqueCount = offlineCount && uniqBy( offlineArr, 'justId' ).length;
 
   const onlineArr = list.filter( han => han.online );
   const onlineCount = list && onlineArr.length;
-  const onlineUniqueCount = onlineCount && uniqBy( onlineArr, 'name' ).length;
+  const onlineUniqueCount = onlineCount && uniqBy( onlineArr, 'justId' ).length;
 
   return (
     <div>
@@ -84,17 +83,21 @@ const List = () => {
       { error && 
         <span>{ error }</span> 
       }
-      <h2 className="count-header">
+      <h3 className="count-header">
         Real-Time and Past 24 Hours Counts
-      </h2>
-      <h3 className="online-count">
+      </h3>
+      <h4 className="online-count">
         Total: { totalCount }, Unique: { totalUniqueCount } 
-      </h3>
-      <h3 className="online-count">
+      </h4>
+      <h4 className="online-count">
         Online (incorrect): { onlineCount }, Unique online people (actual value): { onlineUniqueCount } 
-      </h3>
-      <h3 className="online-count">
+      </h4>
+      <h4 className="online-count">
         Total offline: { offlineCount }, Total unique offline: { offlineUniqueCount } 
+      </h4>
+      
+      <h3 className="list-header">
+        Users List
       </h3>
       <div>
         <ul className="user-list">
