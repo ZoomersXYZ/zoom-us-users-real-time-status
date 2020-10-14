@@ -150,6 +150,9 @@ const manageDbData = async (
       } else {
         // If removing, whole doc is deleted or given some other designation
         console.warn( `${ currFunc }: toKeep is falsey. Setting new doc online to false + dupe to true.` );
+        queryDoc.ref.update( {
+          online: false 
+        } );
         keep = false;
       };
     } else { 
