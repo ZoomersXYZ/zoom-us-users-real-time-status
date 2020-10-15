@@ -21,7 +21,9 @@ const manageDbData = async (
   key, 
   value, 
   handle, 
-  toKeep = true 
+  toKeep, 
+  key2, 
+  value2
 ) => {
   // for logs
   const currFunc = 'manageDbData()';
@@ -150,20 +152,22 @@ const manageDbData = async (
         } );
       } else {
         // This is  for debugging purposes
-
-        // If removing, whole doc is deleted or given some other designation
+        // If removing, whole doc is given some other designation
         console.warn( `${ currFunc }: toKeep is falsey. Setting new doc online to false + dupe to true.` );
         keep = false;
         online = null;
       };
 
       console.warn( `${ currFunc }: Returning: handle: ${ finalFormName }, argot:${ adjustedValue.argot }` );
-      return { 
-        nestedRefId: personFireId, 
-        handle: finalFormName, 
-        argot: adjustedValue.argot, 
-        keep, 
-        online 
+      
+      const nestedRefId = personFireId;
+      const handle = finalFormName;
+      const argot = adjustedValue.argot;
+
+      if ( value2 ) {
+        extraIncorrectZoomWebhooks( db,value2, value, handle, argot, nestedRefId, keep, online );
+      } else {
+        extraIncorrectZoomWebhooks( db, value, null, handle, argot, nestedRefId, keep, online );
       };
 
     } else { 
@@ -172,25 +176,7 @@ const manageDbData = async (
   };
 };
 
-// @@called 1x in Functions.js
-const pushPersonToDb = async ( 
-  db, 
-  userId, 
-  justId, 
-  userName, 
-  toKeep = false 
-) => {
-  // Remove id or user_id that are online. User is going online now. How can there be another instance of them online, fam?
-  const result = await falsifyOnlineStatus( 
-    db, 
-    userId, 
-    justId, 
-    userName, 
-    toKeep
-  );
-  if ( !result ) return false;
-  const { handle, argot, nestedRefId, keep, online } = result;
-
+const extraIncorrectZoomWebhooks = ( db, userId, justId, handle, argot, nestedRefId, keep, online ) => {  
   // Add new fields to user
   const newUser = { 
     userId, 
@@ -212,6 +198,25 @@ const pushPersonToDb = async (
     .set( 
       { ...newUser } 
     );
+};
+
+// @@called 1x in Functions.js
+const pushPersonToDb = async ( 
+  db, 
+  userId, 
+  justId, 
+  userName, 
+  toKeep = false 
+) => {
+  // Remove id or user_id that are online. User is going online now. How can there be another instance of them online, fam?
+  await falsifyOnlineStatus( 
+    db, 
+    userId, 
+    justId, 
+    userName, 
+    toKeep
+  );
+
   console.log( 'pushPerstonToDB(): ref set - not checking tho. what does it return?' );
 };
 
@@ -229,7 +234,9 @@ const falsifyOnlineStatus = async (
       'justId', 
       justId, 
       handle, 
-      toKeep 
+      toKeep, 
+      'userId', 
+      userId 
     );
   } else if ( userId ) {
     return await manageDbData( 
@@ -237,7 +244,7 @@ const falsifyOnlineStatus = async (
       'userId', 
       userId, 
       handle, 
-      toKeep 
+      toKeep, 
     );
   };
 };
