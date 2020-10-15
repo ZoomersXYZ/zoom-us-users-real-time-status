@@ -15,6 +15,13 @@ const List = () => {
     const oneDayAgo = sub( new Date(), {
       days: 1 
     } ).getTime();
+    
+    // const streamOne = db.collectionGroup( 'rt_log' )
+    //   .where( 'timestamp', '>', oneDayAgo ) 
+    //   .where( 'dupe', '==', false ) 
+    //   .orderBy( 'timestamp', 'asc' ) 
+    //   .get().then( doc => { console.log( 'lol' ) } );
+
     const stream = db.collectionGroup( 'rt_log' )
       .where( 'timestamp', '>', oneDayAgo ) 
       .where( 'dupe', '==', false ) 
