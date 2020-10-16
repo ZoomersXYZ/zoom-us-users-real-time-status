@@ -156,22 +156,23 @@ const manageDbData = async (
         console.warn( `${ currFunc }: toKeep is falsey. Setting new doc online to false + dupe to true.` );
         keep = false;
         online = null;
+
+        if ( value2 ) {
+          extraIncorrectZoomWebhooks( db,value2, value, finalFormName, adjustedValue.argot, personFireId, keep, online );
+        } else {
+          extraIncorrectZoomWebhooks( db, value, null, finalFormName, adjustedValue.argot, personFireId, keep, online );
+        };
       };
 
-      console.warn( `${ currFunc }: Returning: handle: ${ finalFormName }, argot:${ adjustedValue.argot }` );
-      
-      const nestedRefId = personFireId;
-      const handle = finalFormName;
-      const argot = adjustedValue.argot;
-
-      if ( value2 ) {
-        extraIncorrectZoomWebhooks( db,value2, value, handle, argot, nestedRefId, keep, online );
-      } else {
-        extraIncorrectZoomWebhooks( db, value, null, handle, argot, nestedRefId, keep, online );
-      };
+      console.warn( `${ currFunc }: Returning: handle: ${ finalFormName }, argot:${ adjustedValue.argot }` )
 
     } else { 
       console.warn( `${ currFunc }: ${ key } == ${ value } -- where query not found` );
+      if ( value2 ) {
+        extraIncorrectZoomWebhooks( db,value2, value, finalFormName, adjustedValue.argot, personFireId, keep, online );
+      } else {
+        extraIncorrectZoomWebhooks( db, value, null, finalFormName, adjustedValue.argot, personFireId, keep, online );
+      };
     };
   };
 };
@@ -216,8 +217,6 @@ const pushPersonToDb = async (
     userName, 
     toKeep
   );
-
-  console.log( 'pushPerstonToDB(): ref set - not checking tho. what does it return?' );
 };
 
 // @@called 1x in Functions.js
